@@ -1,0 +1,6 @@
+{
+	"postgresql_db_command": "psql",
+
+	"display_type": "file",
+	"db_type": "postgresql"
+}

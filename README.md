@@ -6,6 +6,47 @@ SQL client. Results are then put into a scratch file. By tying into the existing
 client, this allows the use of informational commands (such as `\d` in `psql`)
 to pull data that's not typically available via straight SQL.
 
+Settings
+========
+
+I realize that working on a few different projects may well wind up with you needing to connecting to different types and instances of databases on a per-project basis, so SQLRunner supports completely duplicating its settings in your project file as well as under Preferences.
+
+SQLRunner respects settings in the global defaults (`SQLRunner.sublime-settings`) as well as local project settings. It will first look in the per-project settings under the key `SQLRunner`, before moving on to the defaults. For example, in your project file:
+
+```json
+{
+	"folders":
+	[
+		{
+			"path": "/Users/matt/Library/Application Support/Sublime Text 2/Packages/SQLRunner"
+		}
+	],
+	"settings": {
+		"SQLRunner": {
+			"display_type": "file"
+		},
+		"tab_size": 18,
+	},
+	"build_systems":
+	[
+	    {
+	    	"name": "List",
+	    	"cmd": ["ls"]
+	    }
+	]
+}
+```
+
+General
+-------
+
+The following settings are general to operation and don't have any reliance on any specific database.
+
+* `display_type`: "file" or "console", for either opening up a scratch file or display 
+
+Contributions
+=============
+Borrows output display code from [SublimeText-NodeEval](https://github.com/mediaupstream/SublimeText-NodeEval)
 
 License
 =======
