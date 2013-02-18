@@ -26,12 +26,12 @@ class SqlRunnerCommand(sublime_plugin.TextCommand):
             panel(self.view, self._get_setting("clear_output", True),
                self._get_setting("display_type"), output)
 
-    def _get_setting(self, setting):
+    def _get_setting(self, setting, default=None):
         defaults = sublime.load_settings('SQLRunner.sublime-settings')
         project_settings = self.view.settings().get("SQLRunner")
 
         # Try to get the setting out of the project_settings first, and then the defaults.
-        settings = project_settings.get(setting, defaults.get(setting))
+        settings = project_settings.get(setting, defaults.get(setting, default))
 
         return settings
 
