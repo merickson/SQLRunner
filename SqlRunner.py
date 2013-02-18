@@ -16,24 +16,27 @@ class SqlRunnerCommand(sublime_plugin.TextCommand):
             sublime.status_message("Need to set SQLRunner options in project settings!")
             return
 
-        print self.view.settings().get("SQLRunner")
-
         sels = self.view.sel()
         sql = self._get_sql()
 
         for sel in sels:
             output = sql.run(self.view.substr(sel))
-            panel(self.view, self._get_setting("clear_output", True),
-               self._get_setting("display_type"), output)
+            panel(self.view,
+                self._get_setting("clear_output", True),
+                self._get_setting("display_type"),
+                output)
 
     def _get_setting(self, setting, default=None):
         defaults = sublime.load_settings('SQLRunner.sublime-settings')
         project_settings = self.view.settings().get("SQLRunner")
 
         # Try to get the setting out of the project_settings first, and then the defaults.
-        settings = project_settings.get(setting, defaults.get(setting, default))
+        if project_settings is not None:
+            setting = project_settings.get(setting, defaults.get(setting, default))
+        else:
+            setting = defaults.get(setting, default)
 
-        return settings
+        return setting
 
     def _get_sql(self):
         """
@@ -77,10 +80,10 @@ def panel(view, clear, method, message):
             if 'SQLRunner::Output' == tab.name():
                 active = tab
         if active:
-            _output_to_view(view, active, message, clear=clear)
+            _output_to_view(active, message, clear)
             window.focus_view(active)
         else:
-            _scratch(view, message, "SQLRunner::Output", clear=clear)
+            _scratch(view, message, "SQLRunner::Output", clear)
 
 
 def _output_to_view(output_file, output, clear=True):
