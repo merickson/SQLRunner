@@ -23,7 +23,8 @@ class SqlRunnerCommand(sublime_plugin.TextCommand):
 
         for sel in sels:
             output = sql.run(self.view.substr(sel))
-            panel(self.view, True, self._get_setting("display_type"), output)
+            panel(self.view, self._get_setting("clear_output"),
+               self._get_setting("display_type"), output)
 
     def _get_setting(self, setting):
         defaults = sublime.load_settings('SQLRunner.sublime-settings')
