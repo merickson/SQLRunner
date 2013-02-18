@@ -37,12 +37,36 @@ SQLRunner respects settings in the global defaults (`SQLRunner.sublime-settings`
 }
 ```
 
-General
--------
+Package Settings
+----------------
+The following settings aren't specific to any one database.
 
-The following settings are general to operation and don't have any reliance on any specific database.
+* *display_type*: `file` or `console`. Displays SQL output in either a fresh scratch buffer (`file`) or a console panel (`console`).
+* *db_type*: Sets the specific type of database to use.
+* *clear_output*: (**optional**) If `true`, it will clear the output before displaying fresh data. In the absence a setting, defaults to `true`.
 
-* `display_type`: "file" or "console", for either opening up a scratch file or display 
+Database-Type-Agnostic Settings
+-------------------------------
+These settings are for accessing the database you need to use. They're agnostic to the actual DB product in use, and may mean different things based on the type of database.
+
+* *dbname*: Name of the database to use.
+* *hostname*: Hostname of the database server to connect to.
+* *user*: Username to connect to the database server with.
+* *password*: Password to connect to the database server with.
+
+Database-Specific Settings
+--------------------------
+Settings specific to the database type are prefixed with `$db_type-`. For example, to tell SQLRunner the name of your Postgresql executable, you would set:
+
+```json
+{
+	"postgresql_db_command": "psql"
+}
+```
+
+The only *mandatory* database-specific setting is the *_db_command* setting, which tells SQLRunner what command to run to talk to your database.
+
+* *`db_type`_db_command*: the command-line client for your database.
 
 Contributions
 =============
