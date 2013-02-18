@@ -15,10 +15,11 @@ class SqlCommand(object):
     Generic instance of a SqlCommand handling object; all actual work with a
     SQL handler is done via subclasses.
     """
-    def __init__(self, sql_cmd=None):
-        self._sql_prog = sql_cmd
+    def __init__(self, sql_cmd=None, dbname=None):
+        self._sql_cmd = sql_cmd
+        self._dbname = None
 
-    def run_command(self, command_args):
+    def _run_command(self, command_args):
         retcode = 0
         try:
             # I would try to use subprocess.check_output(), however it doesn't
@@ -33,7 +34,8 @@ class SqlCommand(object):
             output = "Exception communicating with DB: %s" % (e,)
 
         if retcode:
-            output = "Return code %d from %s\n\n" % (retcode, self._sql_prog) + output
+            output = "Return code %d from %s\n\n" % \
+                (retcode, self._sql_cmd) + output
 
         return output
 
@@ -42,16 +44,19 @@ class PostgresqlCommand(SqlCommand):
     """
     Postgresql-specific command handler, interacts with 'psql'.
     """
-    def __init__(self, sql_prog=None, dbname=None, host=None, user=None, password=None):
+    def __init__(self, sql_cmd=None, dbname=None, host=None, user=None, password=None):
         if password is not None:
             raise SqlCommandException("PostgresqlCommand does not support passwords at this time.")
 
         self._host = host
         self._user = user
-        super(PostgresqlCommand, self).__init__(sql_prog)
+        super(PostgresqlCommand, self).__init__(sql_cmd, dbname)
 
     def run(self, query):
-        command_args = [self._sql_prog]
+        command_args = [self._sql_cmd]
+
+        if self._dbname is not None:
+            command_args.extend(['-c', self._dbname])
         if self._host is not None:
             command_args.extend(['-h', self._host])
         if self._user is not None:
@@ -59,5 +64,5 @@ class PostgresqlCommand(SqlCommand):
 
         command_args.extend(['-c', query])
 
-        return self.run_command(command_args)
+        return self._run_command(command_args)
 

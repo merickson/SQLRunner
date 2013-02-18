@@ -10,7 +10,7 @@ _SQL_MAPPINGS = {
 
 class SqlRunnerCommand(sublime_plugin.TextCommand):
     def run(self, edit):
-        our_sql = self.view.settings().get('sqlrunner-sql')
+        our_sql = self._get_setting("db_type")
 
         if our_sql is None:
             sublime.status_message("Need to set SQLRunner options in project settings!")
@@ -19,12 +19,10 @@ class SqlRunnerCommand(sublime_plugin.TextCommand):
         print self.view.settings().get("SQLRunner")
 
         sels = self.view.sel()
-        output_view = self.view.window().new_file()
-        output_view.set_scratch(True)
+        sql = self._get_sql()
 
-        sql_cmd = SqlCommand.get()
         for sel in sels:
-            output = sql_cmd.run(self.view.substr(sel))
+            output = sql.run(self.view.substr(sel))
             panel(self.view, True, self._get_setting("display_type"), output)
 
     def _get_setting(self, setting):
@@ -32,20 +30,25 @@ class SqlRunnerCommand(sublime_plugin.TextCommand):
         project_settings = self.view.settings().get("SQLRunner")
 
         # Try to get the setting out of the project_settings first, and then the defaults.
-        project_settings.get(setting, defaults.get(setting))
+        settings = project_settings.get(setting, defaults.get(setting))
 
-    def _get_sql(self, sql_type):
+        return settings
+
+    def _get_sql(self):
         """
         Returns an appropriate SQLCommand object for the configured settings.
         """
+        db_type = self._get_setting("db_type")
 
-        db_opts = self._get_setting("db_type")
+        db_cmd_keyword = "%s_db_command" % (db_type,)
+        db_cmd = self._get_setting(db_cmd_keyword)
 
-        sql = _SQL_MAPPINGS[sql_type](
-            dbname=db_opts.get('dbname'),
-            host=db_opts.get('host'),
-            user=db_opts.get('user'),
-            password=db_opts.get('password'),
+        sql = _SQL_MAPPINGS[db_type](
+            sql_cmd=db_cmd,
+            dbname=self._get_setting('dbname'),
+            host=self._get_setting('host'),
+            user=self._get_setting('user'),
+            password=self._get_setting('password'),
         )
 
         return sql
